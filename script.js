@@ -1,19 +1,23 @@
+const cors = require("cors");
 const express = require("express");
 const { default: mongoose } = require("mongoose");
 
 const app = express();
+app.use(cors());
 app.use(express.json())
 const port = 3000;
 let db = "";
+let x = 20;
 
-app.get("/api/a/twitter", async (req, res) => {
+app.get("/api/1", async (req, res) => {
+  console.log("entrando a api 1")
   try {
     const result = await db
-      .collection("companies")
+      .collection("listingsAndReviews")
       .find({
-        email_address: { $regex: "@twitter.com" },
+        bathrooms: {$gte: 1},
       })
-      .limit(10)
+      .limit(x)
       .toArray();
     res.send(result);
   } catch (error) {
@@ -25,123 +29,40 @@ app.get("/api/a/twitter", async (req, res) => {
   }
 });
 
-app.get("/api/b/founded_year", async (req, res) => {
-  try {
-    const result = await db
-      .collection("companies")
-      .find({
-        founded_year: {
-          $gte: 2005,
-          $lte: 2008,
-        },
-      })
-      .limit(10)
-      .toArray();
-    res.status(200).json({
-      ok: true,
-      message: error.message,
-    });
-  } catch (error) {
-    res.status(400).json({
-      ok: false,
-      message: error.message,
-    });
-  }
-});
-
-app.get("/api/c/technorati-campain", async (req, res) => {
-  try {
-    const result = await db
-      .collection("companies")
-      .find({
-        name: { $regex: "Technorati" },
-      })
-      .limit(10)
-      .toArray();
-    res.send(result);
-  } catch (error) {
-    res.status(400).json({
-      ok: false,
-      message: error.message,
-    });
-  }
-});
-
-app.get("/api/d/category_code/year", async (req, res) => {
-  try {
-    const result = await db
-      .collection("companies")
-      .find({
-        $and: [
-          { category_code: { $regex: "advertising" } },
-          { founded_year: 2002 },
-        ],
-      })
-      .limit(10)
-      .toArray();
-    res.send(result);
-  } catch (error) {
-    res.status(400).json({
-      ok: false,
-      message: error.message,
-    });
-  }
-});
-
-app.get("/api/e/sort/founded_year", async (req, res) => {
-  try {
-    const result = await db
-      .collection("companies")
-      .find({
-        founded_year: {
-          $gte: 0,
-        },
-        $or: [
-          { category_code: { $regex: "messaging" } },
-          { category_code: { $regex: "games_video" } },
-        ],
-      })
-      .sort({ founded_year: 1 })
-      .limit(100)
-      .toArray();
-    res.send(result);
-  } catch (error) {
-    res.status(400).json({
-      ok: false,
-      message: error.message,
-    });
-  }
-});
-
-app.get("/api/data", async (req, res) => {
-  try {
-    const result = await db
-      .collection("companies")
-      .find({
-        founded_year: +req.query.founded_year,
-      })
-      .limit(10)
-      .toArray();
-    res.send(result);
-  } catch (error) {
-    res.status(400).json({
-      ok: false,
-      message: error.message,
-    });
-  }
-});
-
-app.post("/api/data/post", async (req, res) => {
+app.post("/api/8", async (req, res) => {
+  console.log("api aqui")
   console.log(req.body)
   try {
     const result = await db
-      .collection("companies")
-      .find({
-        founded_year: +req.body.founded_year,
-      })
-      .limit(10)
+      .collection("listingsAndReviews")
+      .find(req.body)
+      .limit(x)
       .toArray();
-    res.send(result);
+    res.status(200).json({
+      ok: true,
+      data: result,
+    })
+  } catch (error) {
+    res.status(400).json({
+      ok: false,
+      message: error.message,
+    });
+  }
+});
+app.post("/api/9", async (req, res) => {
+  console.log("api aqui")
+  x = (parseInt(req.body.limite))
+  console.log(x)
+  try {
+    const result = await db
+      .collection("listingsAndReviews")
+      .find(req.body)
+      .limit(x)
+      .toArray();
+    res.status(200).json({
+      ok: true,
+      data: result,
+    })
   } catch (error) {
     res.status(400).json({
       ok: false,
@@ -152,7 +73,7 @@ app.post("/api/data/post", async (req, res) => {
 
 mongoose
   .connect(
-    "mongodb+srv://bit:root@cluster0.upnwart.mongodb.net/sample_training?retryWrites=true&w=majority"
+    "mongodb+srv://bit:root@cluster0.upnwart.mongodb.net/sample_airbnb?retryWrites=true&w=majority"
   )
   .then(() => {
     console.log("conectadome a la BD");
